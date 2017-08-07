@@ -1,14 +1,17 @@
-package de.everald.extendedtextinputlayout
+package everald.github.com.extendedtextinputlayout
 
 import android.content.Context
 import android.content.res.ColorStateList
 import android.support.design.widget.TextInputLayout
 import android.support.v4.view.animation.FastOutSlowInInterpolator
+import android.support.v4.widget.TextViewCompat
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.widget.EditText
 import android.widget.TextView
+import de.everald.extendedtextinputlayout.R
 
 open class ExtendedTextInputLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : TextInputLayout(context, attrs, defStyleAttr) {
 
@@ -22,6 +25,7 @@ open class ExtendedTextInputLayout @JvmOverloads constructor(context: Context, a
                 return
             }
             _helperText = value
+            _helperTextEnabled = value.isNotBlank()
             setHelperTextOnHelperView(value)
         }
 
@@ -30,7 +34,7 @@ open class ExtendedTextInputLayout @JvmOverloads constructor(context: Context, a
         get() = _helperTextAppearance
         set(value) {
             _helperTextAppearance = value
-            helperTextView.setTextAppearance(value)
+            TextViewCompat.setTextAppearance(helperTextView, value)
         }
 
     private var _helperTextColor: ColorStateList? = null
@@ -52,13 +56,14 @@ open class ExtendedTextInputLayout @JvmOverloads constructor(context: Context, a
 
     private var helperTextView = TextView(context).apply {
         setTextAppearance(_helperTextAppearance)
-
         this@ExtendedTextInputLayout.addView(this)
+        val editText = editText ?: return@apply
+        setPaddingRelative(editText.paddingStart, 0, editText.paddingEnd, editText.paddingBottom)
+
     }
 
-
-    override fun addView(child: View?) {
-        super.addView(child)
+    override fun addView(child: View?, params: ViewGroup.LayoutParams?) {
+        super.addView(child, params)
         if (child is EditText) {
             helperTextView.setPaddingRelative(child.paddingStart, 0, child.paddingEnd, child.paddingBottom)
         }
